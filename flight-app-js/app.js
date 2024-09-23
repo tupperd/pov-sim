@@ -2,6 +2,12 @@ const express = require('express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const utils = require('./utils.js');
+const opentelemetry = require('@opentelemetry/api');
+
+const tracer = opentelemetry.trace.getTracer(
+  'instrumentation-scope-name',
+  'instrumentation-scope-version',
+);
 
 const AIRLINES = ['AA', 'UA', 'DL'];
 
@@ -30,6 +36,11 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
  *         description: Returns ok
  */
 app.get('/', (req, res) => {
+  const span = tracer.startSpan('customSpan', {
+    attributres: { route: req.url, method: req.method }
+  });
+  span.addEvent('This custom span generates when homepage is visisted successfully.');
+  span.end();
   res.send({'message': 'ok'});
 });
 
@@ -53,6 +64,7 @@ app.get('/', (req, res) => {
  */
 app.get('/airlines/:err?', (req, res) => {
   if (req.params.err === 'raise') {
+    getTracer();
     throw new Error('Raise test exception');
   }
   res.send({'airlines': AIRLINES});
