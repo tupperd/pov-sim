@@ -12,8 +12,12 @@ const tracer = opentelemetry.trace.getTracer(
 );
 
 // ADDING METRICS INSTRUMENTATION
-const meter = meterProvider.getMeter('flight-app-js', '1.0');
-const requestCounter = meter.createCounter('flightappjshomepage');
+// Custom counter metric
+const counterMeter = meterProvider.getMeter('flight-app-js', '1.0');
+const requestCounter = counterMeter.createCounter('flightappjshomepage');
+// Custom histogram metric
+const histogramMeter = meterProvider.getMeter('flight-app-js', '1.0');
+const histogram = histogramMeter.createHistogram('flightappjshistogram') 
 
 const AIRLINES = ['AA', 'UA', 'DL'];
 
@@ -117,6 +121,8 @@ app.get('/flights/:airline/:err?', (req, res) => {
     throw new Error('Raise test exception');
   }
   const randomInt = utils.getRandomInt(100, 999);
+  histogram.record(randomInt);
+  console.log(`randomInt: ${randomInt}`);
   res.send({ [req.params.airline]: [randomInt] });
 });
 
