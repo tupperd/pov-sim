@@ -17,7 +17,7 @@ const counterMeter = meterProvider.getMeter('flight-app-js', '1.0');
 const requestCounter = counterMeter.createCounter('flightappjshomepage');
 // Custom histogram metric
 const histogramMeter = meterProvider.getMeter('flight-app-js', '1.0');
-const histogram = histogramMeter.createHistogram('flightappjshistogram') 
+const histogram = histogramMeter.createHistogram('flightappjshistogram');
 
 const AIRLINES = ['AA', 'UA', 'DL'];
 
@@ -122,7 +122,6 @@ app.get('/flights/:airline/:err?', (req, res) => {
   }
   const randomInt = utils.getRandomInt(100, 999);
   histogram.record(randomInt);
-  console.log(`randomInt: ${randomInt}`);
   res.send({ [req.params.airline]: [randomInt] });
 });
 

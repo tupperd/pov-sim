@@ -13,7 +13,7 @@ const {
 const resource = Resource.default().merge(
   new Resource({
     [ATTR_SERVICE_NAME]: 'flight-app-js',
-    [ATTR_SERVICE_VERSION]: '0.1.0',
+    [ATTR_SERVICE_VERSION]: '1.0',
   }),
 );
 
