@@ -27,4 +27,5 @@ ENV OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic ODYwMjE1OmdsY19leUp2SWpvaU1U
 EXPOSE 3000
 
 # Command to run the app
-CMD ["node", "app.js"]
+#CMD ["node", "app.js"]
+CMD ["node", "--require", "./instrumentation.js", "app.js"]
