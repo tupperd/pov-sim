@@ -3,6 +3,8 @@ from flasgger import Swagger
 from utils import get_random_int
 
 # TRACES INSTRUMENTATION 
+#
+#
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
@@ -20,10 +22,34 @@ trace.set_tracer_provider(provider)
 # Creates a tracer from the global tracer provider
 tracer = trace.get_tracer("flight.app.py.tracer")
 
+# METRICS INSTRUMENTATION
+#
+#
+from opentelemetry import metrics
+from opentelemetry.sdk.metrics import MeterProvider
+from opentelemetry.sdk.metrics.export import (
+    ConsoleMetricExporter,
+    PeriodicExportingMetricReader,
+)
+
+metric_reader = PeriodicExportingMetricReader(ConsoleMetricExporter())
+provider = MeterProvider(metric_readers=[metric_reader])
+
+# Sets the global default meter provider
+metrics.set_meter_provider(provider)
+
+# Creates a meter from the global meter provider
+meter = metrics.get_meter("flight.app.py.meter")
+
+work_counter = meter.create_counter(
+    name="homepagerequests.py", description="Counts amount of requests to /"
+)
+
 app = Flask(__name__)
 Swagger(app)
 
 AIRLINES = ["AA", "UA", "DL"]
+
 
 @app.route("/")
 def home():
@@ -33,9 +59,13 @@ def home():
       200:
         description: Returns ok
     """
+    # Adding custom span! 
     with tracer.start_as_current_span("davidsCustomSpan") as span:
       print("picked up the span!")
       span.set_attribute("service.name", "flight-app-py")
+    
+    # Incrementing counter after visiting homepage
+    work_counter.add(1, {"service": "flight-app-py"})
     return jsonify({"message": "ok"})
 
 

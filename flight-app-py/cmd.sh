@@ -5,4 +5,5 @@ export OTEL_EXPORTER_OTLP_ENDPOINT="https://otlp-gateway-prod-us-west-0.grafana.
 export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic%20ODYwMjE1OmdsY19leUp2SWpvaU1UQTFOekF4TkNJc0ltNGlPaUp6ZEdGamF5MDROakF5TVRVdGIzUnNjQzEzY21sMFpTMXdiM1l0YzJsdExYQjVJaXdpYXlJNklrOVVTamcxT0VkdGFUZzFaRFIzTURsclQzYzBaM1p3TnlJc0ltMGlPbnNpY2lJNkluQnliMlF0ZFhNdGQyVnpkQzB3SW4xOQ=="
 export OTEL_SERVICE_NAME="flight-app-py"
 export OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED=true
+export OTEL_METRICS_EXPORTER="otlp"
 opentelemetry-instrument flask run --host=0.0.0.0
