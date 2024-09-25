@@ -3,7 +3,12 @@ const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const utils = require('./utils.js');
 
-const { meterProvider,opentelemetry } = require('./instrumentation.js');
+const { meterProvider,loggerProvider,opentelemetry } = require('./instrumentation.js');
+
+// ADDING LOGGING INSTRUMENTATION
+//  To create a log record, you first need to get a Logger instance
+//const logger = loggerProvider.getLogger('flight-app-js');
+const logger = loggerProvider.getLogger('default');
 
 // ADDING TRACING INSTRUMENTATION
 const tracer = opentelemetry.trace.getTracer(
@@ -59,6 +64,14 @@ app.get('/', (req, res) => {
   requestCounter.add(1, { route: req.url });
   currentCount += 1;
   console.log(`Metric emitted: requestCounter incremented ${currentCount}`);
+
+  // Send at least one custom log per endpoint
+  logger.emit({
+    severityText: 'INFO',
+    body: 'Reached this page: /',
+    attributes: { 'log.type': 'LogRecord' },
+  });
+
   res.send({ message: 'ok' });
 });
 
@@ -85,6 +98,12 @@ app.get('/airlines/:err?', (req, res) => {
     getTracer();
     throw new Error('Raise test exception');
   }
+  // Send at least one custom log per endpoint
+  logger.emit({
+    severityText: 'INFO',
+    body: 'Reached /airlines',
+    attributes: { 'log.type': 'LogRecord' },
+  });
   res.send({ airlines: AIRLINES });
 });
 
@@ -121,7 +140,15 @@ app.get('/flights/:airline/:err?', (req, res) => {
     throw new Error('Raise test exception');
   }
   const randomInt = utils.getRandomInt(100, 999);
+  // Add a custom histogram metric that records the random int generated in the /flights endpoint
   histogram.record(randomInt);
+  
+  // Send at least one custom log per endpoint
+  logger.emit({
+    severityText: 'INFO',
+    body: 'Reached /flights/airline',
+    attributes: { 'log.type': 'LogRecord' },
+  });
   res.send({ [req.params.airline]: [randomInt] });
 });
 

@@ -17,6 +17,9 @@ const resource = Resource.default().merge(
   }),
 );
 
+// METRICS
+//
+//
 const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-http');
 const metricReaderOtlp = new PeriodicExportingMetricReader({
   exporter: new OTLPMetricExporter(),
@@ -25,21 +28,28 @@ const metricReaderOtlp = new PeriodicExportingMetricReader({
   exportIntervalMillis: 10000,
 });
 
-const metricReaderConsole = new PeriodicExportingMetricReader({
-  exporter: new ConsoleMetricExporter(),
-
-  // Default is 60000ms (60 seconds). Set to 10 seconds for demonstrative purposes only.
-  exportIntervalMillis: 10000,
-});
-
-
 const meterProvider = new MeterProvider({
   resource: resource,
-  readers: [metricReaderConsole,metricReaderOtlp],
+  readers: [metricReaderOtlp],
 });
 
 // Set this MeterProvider to be global to the app being instrumented.
 opentelemetry.metrics.setGlobalMeterProvider(meterProvider);
 
+// LOGGING 
+//
+//
+const { LoggerProvider, BatchLogRecordProcessor } = require('@opentelemetry/sdk-logs');
+const { OTLPLogExporter } = require('@opentelemetry/exporter-logs-otlp-http');
+
+// Create log exporters (OTLP for Grafana Cloud)
+const logExporter = new OTLPLogExporter();
+
+// Initialize a LoggerProvider and attach the exporters with BatchLogRecordProcessor
+const loggerProvider = new LoggerProvider({
+  resource,
+});
+loggerProvider.addLogRecordProcessor(new BatchLogRecordProcessor(logExporter));
+
 // Export the meter and SDK so they can be used in your application
-module.exports = { meterProvider, opentelemetry };
+module.exports = { meterProvider, loggerProvider, opentelemetry };
