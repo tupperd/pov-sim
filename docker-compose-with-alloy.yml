@@ -1,0 +1,33 @@
+version: '1'
+services:
+  flight-app-js:
+    build:
+      context: ./flight-app-js
+    ports:
+      - "3000:3000"
+    depends_on:
+      - alloy
+
+  flight-app-py:
+    build:
+      context: ./flight-app-py
+    ports:
+      - "5000:5000"
+    depends_on:
+      - alloy
+   
+  alloy:
+    image: grafana/alloy:v1.4.0
+    ports:
+      - "12347:12345"
+      - "12348:12348"
+      - "6832:6832"
+      - "55679:55679"
+    volumes:
+      - "/opt/homebrew/etc/alloy/config.alloy:/etc/alloy/config.alloy"
+    command: [
+      "run",
+      "--server.http.listen-addr=0.0.0.0:12345",
+      "--stability.level=public-preview",
+      "/etc/alloy/config.alloy",
+    ]
