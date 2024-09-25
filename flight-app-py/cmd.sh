@@ -6,4 +6,5 @@ export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic%20ODYwMjE1OmdsY19leUp2SWp
 export OTEL_SERVICE_NAME="flight-app-py"
 export OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED=true
 export OTEL_METRICS_EXPORTER="otlp"
+export OTEL_LOGS_EXPORTER="otlp"
 opentelemetry-instrument flask run --host=0.0.0.0

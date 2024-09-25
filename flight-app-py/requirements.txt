@@ -3,3 +3,4 @@ flasgger==0.9.7.1
 opentelemetry-api
 opentelemetry-sdk
 opentelemetry-instrumentation-flask
+opentelemetry.sdk._logs
